@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        position of an element
+    </title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="{{url_for('static', filename='js/plotly.min.js')}}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="{{url_for('static', filename='js/front.js')}}" defer></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/front.css')}}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Work+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- JavaScript code to display position -->
+    <script>
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>Digital Filter</h1>
+            <nav>
+                <ul>
+                    <li><a id="digIndicator" onclick="digitalFilter()" class="active">Home</a></li>
+                    <li><a id="passIndicator" onclick="passFilter()">pass filter</a></li>
+                    <li><a id="filterIndicator" onclick="Filter()">filter</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="landing">
+        <div class="overlay">
+            <div id="digital_filter">
+                <div class="circle">
+                    <img src="{{url_for('static', filename='img/image542.jpg')}}" alt="" id="circleImage" width="500px" height="502px">
+                    <div class="btns">
+                        <button id="addPole" onclick="add_pole_or_zero(1)">
+                Add Pole
+            </button>
+
+
+                        <button id="addZero" onclick="add_pole_or_zero(0)">
+                Add Zero
+            </button>
+
+                        <!-- <input type=number step=0.01 id="xZero" /> X
+            <input type=number step=0.01 id="yZero" /> Y<br /> -->
+
+                        <!-- <button id='button3' onclick="addCon()">
+                Conjugates
+            </button> -->
+            
+                </div>
+                <div class="clearbtns">
+                    <button id='clrAllZeros' onclick="clrAll(0)">
+                        Clear All Zeros
+                    </button>
+                    <button id='clrAllPoles' onclick="clrAll(1)">
+                        Clear All Poles
+                    </button>
+                    <button id='clrAll' onclick="clrAll(2)">
+                        Clear All
+                    </button>
+                </div>
+
+                </div>
+                <div id="magnitude">
+
+                </div>
+                <div id="phase">
+
+                </div>
+
+            </div>
+            <div id="pass_filter">
+                <div id="pass_phase"></div>
+                <div id="a_phase"></div>
+                <div class="box">
+                    <div class="links">
+                        <h1 class="icon">Filters</h1>
+                        <ul>
+                            <li><a onmouseover="Show([0.5,0.5],0)" onclick="Send([0.5,0.5],0)">Filter 1</a></li>
+                            <li><a onmouseover="Show([0.5,-0.5],0)" onclick="Send([0.5,-0.5],0)">Filter 2</a></li>
+                            <li><a onmouseover="Show([0.1,0.0],0)" onclick="Send([0.1,0.0],0)">Filter 3</a></li>
+                            <li><a onmouseover="Show([-0.5,0.0],0)" onclick="Send([-0.5,0.0],0)">Filter 4</a></li>
+                            <li><a onmouseover="Show([-0.5,0.5],0)" onclick="Send([-0.5,0.5],0)">Filter 5</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="pass_list">
+                    <h1>Pass Filter</h1>
+                    <ol id="used_filters">
+                    </ol>
+                </div>
+                <div id="a_value">
+                    <h1>Create Your Own Filter</h1>
+                    <input placeholder="Real Value" type="text" value="0.0" onchange="Show([0,0],1)" id="a_real">
+                    <input placeholder="Imaginary Value" type="text" value="0.0" onchange="Show([0,0],1)" id="a_imag">
+                    <br>
+                    <button id="add_a" onclick="Send([0,0],1)">Add</button>
+                </div>
+                <button id="apply" onclick="Apply()">Apply Filter</button>
+            </div>
+            <div id="filter">
+                <div class="slidecontainer">
+                    <span id="rangeValue">1</span>
+                    <Input class="range" type="range" name "" value="1" min="1" max="100" onChange="rangeSlide(this.value)" onmousemove="rangeSlide(this.value)"></Input>
+                </div>
+                <div id="not_filtered">
+
+                </div>
+                <div id="filtered">
+
+                </div>
+                <!-- <label id="choose_file_label"> Enter Your File -->
+                <!-- <form action=""> -->
+                <input id="choose_file" type="file">
+                <!-- <button type="submit" id="submit" onclick="Submit()">Submit</button> -->
+                <!-- </form> -->
+
+                <!-- </label> -->
+                <!-- <button id="choose_file" type="f" onclick="">Choose File</button> -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var dataRec = [{
+            x: null,
+            y: null,
+            mode: "lines",
+            type: "scatter"
+        }];
+
+        // Define Layout
+        var layout = {
+            xaxis: {
+                range: [0, 10],
+                title: "W"
+            },
+            yaxis: {
+                range: [0, 1],
+                title: "Mag"
+            },
+            title: "MAGNITUDE",
+            autosize: false,
+            width: 800,
+            height: 350,
+        };
+
+        // Display using Plotly
+        Plotly.newPlot("magnitude", dataRec, layout);
+        var dataRec = [{
+            x: null,
+            y: null,
+            mode: "lines",
+            type: "scatter"
+        }];
+
+        // Define Layout
+        var layout = {
+            xaxis: {
+                range: [0, 10],
+                title: "W"
+            },
+            yaxis: {
+                range: [0, 1],
+                title: "Phase"
+            },
+            title: "PHASE",
+            autosize: false,
+            width: 800,
+            height: 350,
+        };
+
+        // Display using Plotly
+        Plotly.newPlot("phase", dataRec, layout);
+        Plotly.newPlot("pass_phase", dataRec, layout);
+        Plotly.newPlot("a_phase", dataRec, layout);
+
+        var dataRec = [{
+            x: null,
+            y: null,
+            mode: "lines",
+            type: "scatter"
+        }];
+
+        // Define Layout
+        var layout = {
+            xaxis: {
+                range: [0, 10],
+                
+            },
+            yaxis: {
+                range: [0, 1],
+                
+            },
+            title: "Original Signal",
+            autosize: false,
+            width: 800,
+            height: 350,
+        };
+        Plotly.newPlot("not_filtered", dataRec, layout);
+
+        var dataRec = [{
+            x: null,
+            y: null,
+            mode: "lines",
+            type: "scatter"
+        }];
+
+        // Define Layout
+        var layout = {
+            xaxis: {
+                range: [0, 10],
+                
+            },
+            yaxis: {
+                range: [0, 1],
+                
+            },
+            title: "Filtered Signal",
+            autosize: false,
+            width: 800,
+            height: 350,
+        };
+        Plotly.newPlot("filtered", dataRec, layout);
+
+
+
+        var digital_filter = document.getElementById("digital_filter");
+        var pass_filter = document.getElementById("pass_filter");
+        var filter = document.getElementById("filter");
+        var digIndicator = document.getElementById("digIndicator");
+        var passIndicator = document.getElementById("passIndicator");
+        var filterIndicator = document.getElementById("filterIndicator");
+
+
+        function digitalFilter() {
+            // if(last == 1){
+            //     pass_filter.style.left = "-1570px";
+            //     digital_filter.style.left = "0px";
+            // }else if(last == 2){
+            //     filter.style.left = "-1570px";
+            //     digital_filter.style.left = "0px";
+            // }else{
+            //     digital_filter.style.transform = "translateX(0px)";
+            //     pass_filter.style.transform = "translateX(0px)";
+            //     filter.style.transform = "translateX(0px)";
+
+            // }
+            pass_filter.style.display = "none";
+            filter.style.display = "none";
+            digital_filter.style.display = "block";
+            if (passIndicator.classList.contains('active')) {
+                passIndicator.classList.remove("active");
+            }
+            else if (filterIndicator.classList.contains('active')) {
+                filterIndicator.classList.remove("active");
+            }
+            digIndicator.classList.add("active");
+        }
+
+        function passFilter() {
+            // if(last == 0){
+            //     digital_filter.style.left = "-1570px";
+            //     pass_filter.style.left = "0px";
+            // }else if(last == 2){
+            //     filter.style.left = "1570px";
+            //     pass_filter.style.left = "0px";
+            // }else{
+            //     digital_filter.style.transform = "translateX(0px)";
+            //     pass_filter.style.transform = "translateX(0px)";
+            //     filter.style.transform = "translateX(0px)";
+            // }
+            digital_filter.style.display = "none";
+            filter.style.display = "none";
+            pass_filter.style.display = "block";
+            if (digIndicator.classList.contains('active')) {
+                digIndicator.classList.remove("active");
+            }
+            else if (filterIndicator.classList.contains('active')) {
+                filterIndicator.classList.remove("active");
+            }
+            passIndicator.classList.add("active");
+        }
+
+        function Filter() {
+            // if(last == 0){
+            //     digital_filter.style.left = "-1570px";
+            //     filter.style.left = "0px";
+            // }else if(last == 1){
+            //     pass_filter.style.left = "-1570px";
+            //     filter.style.left = "0px";
+            // }else{
+            //     digital_filter.style.transform = "translateX(0px)";
+            //     pass_filter.style.transform = "translateX(0px)";
+            //     filter.style.transform = "translateX(0px)";
+            // }
+            pass_filter.style.display = "none";
+            digital_filter.style.display = "none";
+            filter.style.display = "block";
+            if (digIndicator.classList.contains('active')) {
+                digIndicator.classList.remove("active");
+            }
+            else if (passIndicator.classList.contains('active')) {
+                passIndicator.classList.remove("active");
+            }
+            filterIndicator.classList.add("active");
+        }
+
+        // onload = fetch("data.csv").then ( res =>{
+        //     return res.text();
+        // }).then(data => {
+        //     let result = data.split('/\r?\n|\/').map;
+        //     (e = > {
+        //         return e.split()
+        //     })
+
+        // })
+    </script>
+</body>
+
+</html>
